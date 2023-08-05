@@ -4,19 +4,13 @@
 //
 //  Created by Kimberly Brewer on 7/26/23.
 //
-// TODO: Add the launch date below the mission badge
-// TODO: Extract the horizontal scrollview into it's own view
 
 import SwiftUI
 /// Detail view for the missions
 struct MissionView: View {
-    struct CrewMember {
-        let role: String
-        let astronaut: Astronaut
-    }
     let mission: Mission
-    let crew: [CrewMember]
-    /// View
+    let crew: [CrewMember] // not sure if i need this in here?
+    // View
     var body: some View {
         GeometryReader { geo in
             ScrollView {
@@ -28,53 +22,25 @@ struct MissionView: View {
                         .padding(.bottom, 8)
                     Divider()
                     Text("Mission Highlights")
-                        .font(.title.bold())
-                        .textCase(.uppercase)
+                        .font(.custom("SpaceMono-Regular", size: 30))
                         .padding(.bottom, 5)
+                    Text("Launch Date: \(mission.formattedLaunchDate)")
+                        .font(.custom("SpaceMono-Regular", size: 15))
                     Divider()
                     VStack(alignment: .leading) {
-
                         Text(mission.description)
                             .multilineTextAlignment(.center)
                     }
                     .padding(.horizontal)
                     Divider()
-                        Text("Crew")
-                            .foregroundStyle(Color.white)
-                            .font(.headline)
-                            .textCase(.uppercase)
-
-                    .padding(.leading, 10)
+                    Text("Crew")
+                        .font(.custom("SpaceMono-Regular", size: 25))
+                        .textCase(.uppercase)
+                        .foregroundStyle(Color.white)
+                        .padding(.leading, 10)
                     Divider()
-                    /// Bottom scroll with non-default settings
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(crew, id: \.role) { crewMember in
-                                NavigationLink {
-                                    AstronautView(astronaut: crewMember.astronaut)
-                                } label: {
-                                    Image(crewMember.astronaut.id)
-                                        .resizable()
-                                        .frame(width: 104, height: 72)
-                                        .clipShape(Capsule())
-                                        .overlay(
-                                        Capsule()
-                                        /// StrokeBorder - draws the stroke INSIDE the image, rather than the standard
-                                        /// half inside/half outside
-                                            .strokeBorder(.white, lineWidth: 1)
-                                        )
-                                    VStack(alignment: .leading) {
-                                        Text(crewMember.astronaut.name)
-                                            .foregroundStyle(Color.white)
-                                            .font(.headline)
-                                        Text(crewMember.role)
-                                            .foregroundStyle(Color.white.opacity(0.7))
-                                    }
-                                }
-                                .padding(.horizontal)
-                            }
-                        }
-                    }
+                    // Bottom scroll with non-default settings
+                    CrewView(crew: crew)
                 }
                 .padding(.bottom)
             }
@@ -89,7 +55,7 @@ struct MissionView: View {
         self.mission = mission
         self.crew = mission.crew.map { member in
             if let astronaut = astronauts[member.name] {
-                /// we found the crew member
+                // we found the crew member
                 return CrewMember(role: member.role, astronaut: astronaut)
             } else {
                 fatalError("Missing \(member.name)")
